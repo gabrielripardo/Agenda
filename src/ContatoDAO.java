@@ -1,5 +1,3 @@
-
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,37 +6,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContatoDAO {
-private Connection conexao;
-private boolean isEmpty;
+	private Connection conexao;
 
-	DbContato(){
-		conexao = null;
-		isEmpty = true;
+	public ContatoDAO(Connection conexao) {
+		this.conexao = conexao;
 	}
 	
-	public void abrirConexao() {
-		if(this.conexao == null){
-			this.conexao = new ConnectionAgenda().getConnection();
+	void verificarBanco() {
+		try {
+			String sql = "select * from sqlite_master where type='table'"; 
+			PreparedStatement stmt = conexao.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			if(!rs.next()) {
+				criarBanco();
+			}
+		}catch(SQLException e) {
+			System.out.print("Error ao verificar Banco de Dados");
 		}
 	}
 	void criarBanco() {
 		try {         
-			this.abrirConexao();
 			String sql = "create table contatos(id integer primary key not null, nome varchar(20), telefone varchar(15), email varchar(30))";
 			PreparedStatement stmt = this.conexao.prepareStatement(sql);
 			stmt.execute();
 			stmt.close();
-			isEmpty = false;
 		}catch(SQLException e) {
 			System.out.print("Não foi possível criar campos! "+e);
-		}finally {
-			this.fecharConexao();
 		}
 	}
 	public void adicionarContato(Contato conta) {
-		try{
-			this.abrirConexao();
-			
+		try{	
 			String sql = "insert into contatos(nome, telefone, email) values(?,?,?)";
 			PreparedStatement stmt = this.conexao.prepareStatement(sql);
 			
@@ -50,19 +47,13 @@ private boolean isEmpty;
 			stmt.close();
 		}
 		catch(SQLException e){
-			if(isEmpty) {
-				this.criarBanco();
-				this.adicionarContato(conta);
-			}
-		}finally {
-			this.fecharConexao();
+			System.out.print("Erro ao adicionar: "+e);
 		}
 	}
 	public List<Contato> listarData(){
 		List<Contato> contas = new ArrayList<Contato>();
 		
 		try {
-			abrirConexao();
 			String sqlSelect = "select * from contatos";
 			PreparedStatement stmt = this.conexao.prepareStatement(sqlSelect);
 			ResultSet rs = stmt.executeQuery();
@@ -70,7 +61,7 @@ private boolean isEmpty;
 			while(rs.next()) {
 				Contato c = new Contato(); // Criar novo objeto Contato para guardar os dados que ele irá capturar do select
 				
-				c.setNome(rs.getString("NOME")); // Inseri o valor de Nome do DB em um objeto Contato
+				c.setNome(rs.getString("NOME")); // Inserir o valor de Nome do DB em um objeto Contato
 				c.setTelefone(rs.getString("TELEFONE"));
 				c.setEmail(rs.getString("EMAIL"));
 				c.setId(rs.getInt("ID"));
@@ -80,13 +71,7 @@ private boolean isEmpty;
 			rs.close();
 			stmt.close();
 		}catch(SQLException e) {
-			if(isEmpty) {
-				this.criarBanco();
-				this.listarData();
-			}
-		}
-		finally {
-			this.fecharConexao();
+			System.out.print("Erro ao Listar todos os contatos"+e);
 		}
 		return contas;
 	}
@@ -127,34 +112,15 @@ private boolean isEmpty;
 		}
 		return cs;
 	}
-	public void fecharConexao() {
-		try{
-			if(this.conexao != null){
-				this.conexao.close();
-				this.conexao = null;
-			}
-		}catch(SQLException e){
-			if(isEmpty) {
-				this.criarBanco();
-				this.fecharConexao();
-			}
-		}
-	}
 	public void deletarContato(int ctId) {
 		try {
-			this.abrirConexao();
 			String sqlDel = "delete from contatos where id=?";
 			PreparedStatement stmt = this.conexao.prepareStatement(sqlDel);
 			stmt.setInt(1, ctId);	
 			stmt.execute();
 			stmt.close();
 		}catch(SQLException e){
-			if(isEmpty) {
-				this.criarBanco();
-				this.deletarContato(ctId);
-			}
-		}finally {
-			this.fecharConexao();
+			System.out.print("Error ao deletar contato: "+e);
 		}
 	}
 }

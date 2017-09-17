@@ -1,19 +1,21 @@
 
+import java.sql.Connection;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class PrintContato extends DbContato{
+public class PrintContato extends ContatoDAO{
 	public Contato conta;
 	public Scanner entry;
 	public boolean isEmpty; // Atibuto usado por dois métodos para verificar se há conteúdo na tabela
 	
-	public PrintContato(){
+	PrintContato(Connection cnx){
+		super(cnx);
 		entry = new Scanner(System.in);
 		conta = new Contato();
 		isEmpty = true;
 	}
-	public int verificarBanco() { // Verifica se tem conteúdo no Banco
+	public int verificarContatos() { // Verifica se tem conteúdo no Banco
 		int ids = 0;
 		List <Contato> listCts = super.listarData();
 		for(Contato ct:listCts) {
@@ -36,11 +38,11 @@ public class PrintContato extends DbContato{
 		conta.setTelefone(telCt);
 		conta.setEmail(mailCt);
 		
-		int idsOld = this.verificarBanco(); // Verifica a quantidade de contatos atual
+		int idsOld = this.verificarContatos(); // Verifica a quantidade de contatos atual
 		
-		super.adicionarContato(conta); // Adiciona o objeto contato no bd
+		super.adicionarContato(conta); // Adiciona o objeto contato no super
 		
-		int idsNew = this.verificarBanco(); // Verifica se o novo contato foi adicionado
+		int idsNew = this.verificarContatos(); // Verifica se o novo contato foi adicionado
 		if(idsNew > idsOld) {
 			return true;
 		}else {
@@ -65,7 +67,7 @@ public class PrintContato extends DbContato{
 	public List<Contato> buscarPorNome(){
 		isEmpty = true;
 		List <Contato> listCtsNm = null; 
-		if(this.verificarBanco() > 0) {
+		if(this.verificarContatos() > 0) {
 			System.out.print("Digite o nome: ");
 			String nomCt = entry.next();
 			
@@ -90,7 +92,7 @@ public class PrintContato extends DbContato{
 		return listCtsNm;
 	}
 	public boolean deletar(){
-		int idsOld = this.verificarBanco();
+		int idsOld = this.verificarContatos();
 		List<Contato> choose = buscarPorNome();
 		if(isEmpty == false) {		
 			System.out.println("\n>> Escolha um id referente ao contato <<");
@@ -106,7 +108,7 @@ public class PrintContato extends DbContato{
 					System.out.println("O Id não está correto ");	
 				}	
 		}
-		int idsNew = this.verificarBanco();
+		int idsNew = this.verificarContatos();
 		if(idsNew < idsOld) {
 			return true;
 		}else {
@@ -117,12 +119,5 @@ public class PrintContato extends DbContato{
 		for(int c=0; c<100; c++) {
 			System.out.println("");
 		}
-	}
-	public static void main(String[] args) {
-		PrintContato obj = new PrintContato();
-		Contato ct = new Contato();
-		ct.setNome("MYTESTE");
-		obj.adicionarContato(ct);
-		obj.buscarTodos();
 	}
 }
