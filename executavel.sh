@@ -2,7 +2,7 @@ echo ''
 echo "                                Agenda_Console"
 echo ''
 echo ''
-echo "                                  versão 1.0"
+echo "                                  versão 1.1"
 echo "                              por Gabriel Ripardo"
 echo " A Agenda_Console é um simples open-source feito em java para fins de aprendizado"
 echo ''
