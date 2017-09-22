@@ -1,7 +1,7 @@
 /**
  * Agenda em Console
  * @author Gabriel Ripardo
- * @date 08/09/2017
+ * @date 22/09/2017
  * @descrition Uma simples agenda que adiciona, lista e remove contatos em um banco de dados SQLite.
  */
 
@@ -21,8 +21,9 @@ public class Start {
 					+ "======");
 			System.out.println("1. Inserir um contato                 ======");
 			System.out.println("2. Buscar todos os contatos           ======");
-			System.out.println("3. Buscar contato pelo nome           ======");
-			System.out.println("4. Apagar contato                     ======");
+			System.out.println("3. Buscar pelo nome                   ======");
+			System.out.println("4. Buscar pelo mês de aniverário      ======");
+			System.out.println("5. Apagar contato                     ======");
 			System.out.println("============================================");
 			System.out.print("Escolha uma opção: ");
 			
@@ -91,6 +92,25 @@ public class Start {
 						}
 						break;
 					case 4:
+						while(true) {
+							agenda.limparTela();
+							System.out.println(":::::::::::::::::::::: Busca por mês de aniversário ::::::::::::::::::::::");
+							boolean ok = agenda.buscarPorAniversario();
+							if(ok == false) {
+								System.out.println("Nenhum contato encontrado");
+							}
+							System.out.println("\nDeseja continuar? s/n: ");
+							choosed = agenda.entry.next();
+							if(choosed.toLowerCase().equals("s")) {
+								continue;
+							}else {
+								agenda.limparTela();
+								restart = true;
+								break;
+							}
+						}
+						break;
+					case 5:
 						while(true) {
 							agenda.limparTela();
 							boolean ok = agenda.deletar();
