@@ -4,13 +4,14 @@
  * @date 08/09/2017
  * @descrition Uma simples agenda que adiciona, lista e remove contatos em um banco de dados SQLite.
  */
-
-
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 
 public class Start {
 	public static void main(String[] args) {
-		PrintContato agenda = new PrintContato();
+		Connection conexao = null;
+		PrintContato agenda = null;
 		boolean restart = false;
 		do {
 			System.out.println("============================================");
@@ -27,6 +28,10 @@ public class Start {
 			System.out.print("Escolha uma opção: ");
 			
 			try {
+				conexao = new ConnectionAgenda().getConnection();
+				agenda = new PrintContato(conexao);
+				
+				agenda.verificarBanco();
 				int opcao = agenda.entry.nextInt();
 				
 				String choosed = null;
@@ -118,6 +123,14 @@ public class Start {
 				agenda.limparTela();
 				System.out.println("\nSintaxe Incorreta!\n> Digite uma opção de 1 à 4");
 				main(args);
+			}
+			finally {
+				try {
+					conexao.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}while(restart);
 	}
