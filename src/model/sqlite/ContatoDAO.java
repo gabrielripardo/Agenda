@@ -1,3 +1,4 @@
+package model.sqlite;
 /**
 * @descrition Classe Dao que realiza toda a manipulação pura com o banco de dados.
 * @date 09-23-2017
@@ -15,7 +16,7 @@ public class ContatoDAO {
 private Connection conexao;
 private boolean isEmpty;
 
-	ContatoDAO(){
+	public ContatoDAO(){
 		conexao = null;
 		isEmpty = true;
 	}
@@ -28,7 +29,7 @@ private boolean isEmpty;
 	void criarBanco() {
 		try {                                //id integer primary key autoincrement not null
 			this.abrirConexao();
-			String sql = "create table contatos(id integer primary key autoincrement not null, nome varchar(20), telefone varchar(15), email varchar(30), dtNascimento varchar(9), twitter varchar(15), address varchar(30))";
+			String sql = "create table if not exists contatos(id integer primary key not null, nome varchar(20), telefone varchar(15), email varchar(30), dia integer, mes integer, ano integer, twitter varchar(10), address varchar(20))";
 			PreparedStatement stmt = this.conexao.prepareStatement(sql);
 			stmt.execute();
 			stmt.close();
@@ -67,29 +68,19 @@ private boolean isEmpty;
 			this.fecharConexao();
 		}
 	}
-	public boolean atualizarConta(int typeEdit, String valueUpdated, int contaId) {
+	public void atualizarConta(Contato ct) {
 		try {
 			this.abrirConexao();
-			String sql = null;
-			
-			switch(typeEdit) {
-			case 1: sql = "update contatos set nome=? where id=?"; 
-			break;
-			case 2: sql = "update contatos set telefone=? where id=?"; 
-			break;
-			case 3: sql = "update contatos set email=? where id=?"; 
-			break;
-			case 4: sql = "update contatos set dtnascimento=? where id=?"; 
-			break;
-			case 5: sql = "update contatos set twitter=? where id=?"; 
-			break;
-			case 6: sql = "update contatos set address=? where id=?"; 
-			break;
-			}
-			
+						
+			String sql = "update contatos set nome=? telefone=? email=? dtnascimento=? twitter=? address=? where id=?";
 			PreparedStatement stmt = conexao.prepareStatement(sql);
-			stmt.setString(1, valueUpdated);
-			stmt.setInt(2, contaId);
+			stmt.setString(1, ct.getNome());
+			stmt.setString(2, ct.getTelefone());
+			stmt.setString(3, ct.getEmail());
+			stmt.setString(4, ct.getDtNascimento());
+			stmt.setString(5, ct.getTwitter());
+			stmt.setString(6, ct.getAddress());
+			stmt.setInt(2, ct.getId());
 			
 			stmt.execute();
 			stmt.close();
@@ -98,7 +89,6 @@ private boolean isEmpty;
 		}finally{
 			this.fecharConexao();
 		}
-		return true;
 	}
 	public List<Contato> listarAniversariantesdomes(int mesNiver){
 		List<Contato> contatos = new ArrayList<Contato>(); 
@@ -114,7 +104,9 @@ private boolean isEmpty;
 				c.setNome(rs.getString("NOME")); // Inseri o valor de Nome do DB em um objeto Contato
 				c.setTelefone(rs.getString("TELEFONE"));
 				c.setEmail(rs.getString("EMAIL"));
-				c.setDtNascimento(rs.getString("DTNASCIMENTO"));
+				c.setDia(rs.getInt("DIA"));
+				c.setDia(rs.getInt("MES"));
+				c.setDia(rs.getInt("ANO"));
 				c.setTwitter(rs.getString("TWITTER"));
 				c.setAddress(rs.getString("ADDRESS"));
 				c.setId(rs.getInt("ID"));
@@ -150,7 +142,9 @@ private boolean isEmpty;
 				c.setNome(rs.getString("NOME")); // Inseri o valor de Nome do DB em um objeto Contato
 				c.setTelefone(rs.getString("TELEFONE"));
 				c.setEmail(rs.getString("EMAIL"));
-				c.setDtNascimento(rs.getString("DTNASCIMENTO"));
+				c.setDia(rs.getInt("DIA"));
+				c.setDia(rs.getInt("MES"));
+				c.setDia(rs.getInt("ANO"));
 				c.setTwitter(rs.getString("TWITTER"));
 				c.setAddress(rs.getString("ADDRESS"));
 				c.setId(rs.getInt("ID"));
